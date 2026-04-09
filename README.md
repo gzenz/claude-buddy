@@ -72,6 +72,8 @@ Three commands. Fully automated. No manual config.
 | **Claude Code** v2.1.80+ | Any version with MCP support |
 | **jq** | Auto-installed, or: `apt install jq` / `brew install jq` |
 
+> **Will I get the same buddy I had?** Yes. claude-buddy uses the exact same algorithm as the original (wyhash + mulberry32, same salt, same identity resolution). If your `~/.claude.json` still has your `accountUuid`, you'll get the identical species, rarity, stats, and cosmetics. Bun is required for correct wyhash computation — without it, the fallback hash produces different results.
+
 ## How It Works
 
 ```
