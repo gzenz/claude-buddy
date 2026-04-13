@@ -30,7 +30,7 @@ POPUP_W=12       # minimum / fallback
 ART_W=12         # updated dynamically by compute_art_width
 BUBBLE_EXTRA=3 # border top + border bottom + connector line
 BORDER_EXTRA=0 # +2 on tmux < 3.3 (popup has a border)
-REACTION_TTL=20 # seconds
+REACTION_TTL=20 # seconds; overridden by config
 REACTION_FILE="$BUDDY_DIR/reaction.$SID.json"
 RESIZE_FLAG="$BUDDY_DIR/popup-resize.$SID"
 CONFIG_FILE="$BUDDY_DIR/config.json"
@@ -44,6 +44,8 @@ if [ -f "$CONFIG_FILE" ]; then
   case "$_bp" in top|left) BUBBLE_POSITION="$_bp" ;; esac
   _sr=$(jq -r 'if .showRarity == false then "false" else "true" end' "$CONFIG_FILE" 2>/dev/null || echo "true")
   [ "$_sr" = "false" ] && SHOW_RARITY=0
+  _ttl=$(jq -r '.reactionTTL // 20' "$CONFIG_FILE" 2>/dev/null || echo 20)
+  case "$_ttl" in ''|*[!0-9]*) ;; *) REACTION_TTL="$_ttl" ;; esac
 fi
 
 BASE_H=8      # art(4) + blank(1) + name(1) + rarity(1) + padding(1)
@@ -135,9 +137,13 @@ compute_dimensions() {
         local ts now age
         ts=$(jq -r '.timestamp // 0' "$REACTION_FILE" 2>/dev/null || echo 0)
         if [ "$ts" != "0" ]; then
-          now=$(date +%s)
-          age=$(( now - ts / 1000 ))
-          [ "$age" -lt "$REACTION_TTL" ] && fresh=1
+          if [ "$REACTION_TTL" -eq 0 ]; then
+            fresh=1  # TTL=0 means permanent
+          else
+            now=$(date +%s)
+            age=$(( now - ts / 1000 ))
+            [ "$age" -lt "$REACTION_TTL" ] && fresh=1
+          fi
         fi
       fi
       if [ "$fresh" -eq 1 ]; then
