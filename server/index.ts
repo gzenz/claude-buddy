@@ -377,7 +377,7 @@ server.tool(
 
 server.tool(
   "buddy_style",
-  "Configure the buddy bubble appearance. Returns current settings if called without arguments.",
+  "Configure the popup appearance. Returns current settings if called without arguments.",
   {
     style: z
       .enum(["classic", "round"])
@@ -394,7 +394,7 @@ server.tool(
     showRarity: z
       .boolean()
       .optional()
-      .describe("Show or hide the stars + rarity line in the status line"),
+      .describe("Show or hide the stars + rarity line in the popup"),
   },
   async ({ style, position, showRarity }) => {
     if (
